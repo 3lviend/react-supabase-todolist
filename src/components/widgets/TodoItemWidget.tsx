@@ -1,5 +1,4 @@
-import { TODOS_TABLE } from '@/library/powersync/AppSchema';
-import { useIsPowerSync, usePowerSyncOptional, usePGliteOptional } from '@/hooks/useSyncEngine';
+import { usePGliteOptional } from '@/hooks/useSyncEngine';
 import { useSupabase } from '../providers/SyncProvider';
 import { queueWrite } from '@/library/electric_sql/WriteQueue';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -10,6 +9,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import { Box, IconButton, ListItem, ListItemAvatar, ListItemButton, ListItemText, Paper, TextField, styled } from '@mui/material';
 import React from 'react';
 
+const TODOS_TABLE = 'todos';
+
 export type TodoItemWidgetProps = {
   id: string;
   description: string | null;
@@ -19,22 +20,16 @@ export type TodoItemWidgetProps = {
 export const TodoItemWidget: React.FC<TodoItemWidgetProps> = React.memo((props) => {
   const { id, description, isComplete } = props;
 
-  const isPowerSync = useIsPowerSync();
-  const powerSync = usePowerSyncOptional();
   const pglite = usePGliteOptional();
   const supabase = useSupabase();
 
   const deleteTodo = React.useCallback(async () => {
-    if (isPowerSync && powerSync) {
-      await powerSync.writeTransaction(async (tx: any) => {
-        await tx.execute(/* sql */ `DELETE FROM ${TODOS_TABLE} WHERE id = ?`, [id]);
-      });
-    } else if (pglite) {
+    if (pglite) {
       // PGlite: delete locally + queue for sync
       await pglite.query(`DELETE FROM ${TODOS_TABLE} WHERE id = $1`, [id]);
       await queueWrite(pglite, TODOS_TABLE, 'delete', {}, id);
     }
-  }, [id, isPowerSync, powerSync, pglite]);
+  }, [id, pglite]);
 
   const toggleCompletion = React.useCallback(async () => {
     let completedAt: string | null = null;
@@ -47,12 +42,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = React.memo((props) 
       completedBy = userID;
     }
 
-    if (isPowerSync && powerSync) {
-      await powerSync.execute(
-        /* sql */ `UPDATE ${TODOS_TABLE} SET completed = ?, completed_at = ?, completed_by = ? WHERE id = ?`,
-        [!isComplete, completedAt, completedBy, id]
-      );
-    } else if (pglite) {
+    if (pglite) {
       // PGlite: update locally + queue for sync
       const newCompleted = !isComplete;
       await pglite.query(
@@ -65,7 +55,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = React.memo((props) 
         completed_by: completedBy
       }, id);
     }
-  }, [id, isComplete, isPowerSync, powerSync, pglite, supabase]);
+  }, [id, isComplete, pglite, supabase]);
 
   const [isEditing, setIsEditing] = React.useState(false);
   const [editText, setEditText] = React.useState(description || '');
@@ -88,12 +78,7 @@ export const TodoItemWidget: React.FC<TodoItemWidgetProps> = React.memo((props) 
       return;
     }
 
-    if (isPowerSync && powerSync) {
-      await powerSync.execute(
-        /* sql */ `UPDATE ${TODOS_TABLE} SET description = ? WHERE id = ?`,
-        [editText, id]
-      );
-    } else if (pglite) {
+    if (pglite) {
       // PGlite: update locally + queue for sync
       await pglite.query(
         `UPDATE ${TODOS_TABLE} SET description = $1 WHERE id = $2`,

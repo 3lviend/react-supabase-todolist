@@ -1,10 +1,11 @@
 import { Autocomplete, Box, Card, CardContent, FormControl, TextField, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePowerSync } from '@powersync/react';
-import { LISTS_TABLE, ListRecord } from '@/library/powersync/AppSchema';
 import { SearchResult, searchTable } from '@/app/utils/fts_helpers';
 import { TODO_LISTS_ROUTE } from '@/app/router';
+import { usePGliteOptional } from '@/hooks/useSyncEngine';
+
+const LISTS_TABLE = 'lists';
 
 // This is a simple search bar widget that allows users to search for lists and todo items
 export const SearchBarWidget: React.FC<any> = () => {
@@ -12,21 +13,28 @@ export const SearchBarWidget: React.FC<any> = () => {
   const [value, setValue] = React.useState<SearchResult | null>(null);
 
   const navigate = useNavigate();
-  const powersync = usePowerSync();
+  const pglite = usePGliteOptional();
 
   const handleInputChange = async (value: string) => {
-    if (value.length !== 0) {
+    if (value.length !== 0 && pglite) {
       let listsSearchResults: any[] = [];
-      const todoItemsSearchResults = await searchTable(value, 'todos');
+      const todoItemsSearchResults = await searchTable(pglite, value, 'todos');
+
       for (let i = 0; i < todoItemsSearchResults.length; i++) {
-        const res = await powersync.get<ListRecord>(`SELECT * FROM ${LISTS_TABLE} WHERE id = ?`, [
-          todoItemsSearchResults[i]['list_id']
-        ]);
-        todoItemsSearchResults[i]['list_name'] = res.name;
+        // Fetch list name for the todo
+        const listId = todoItemsSearchResults[i]['list_id'];
+        const res = await pglite.query(`SELECT name FROM ${LISTS_TABLE} WHERE id = $1`, [listId]);
+        if (res.rows.length > 0) {
+          todoItemsSearchResults[i]['list_name'] = (res.rows[0] as any).name;
+        } else {
+          todoItemsSearchResults[i]['list_name'] = 'Unknown List';
+        }
       }
+
       if (!todoItemsSearchResults.length) {
-        listsSearchResults = await searchTable(value, 'lists');
+        listsSearchResults = await searchTable(pglite, value, 'lists');
       }
+
       const formattedListResults: SearchResult[] = listsSearchResults.map(
         (result) => new SearchResult(result['id'], result['name'])
       );

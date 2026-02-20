@@ -12,13 +12,15 @@ import {
 import React from 'react';
 
 import { TODO_LISTS_ROUTE } from '@/app/router';
-import { LISTS_TABLE, TODOS_TABLE } from '@/library/powersync/AppSchema';
-import { useIsPowerSync, usePowerSyncOptional, usePGliteOptional } from '@/hooks/useSyncEngine';
+import { usePGliteOptional } from '@/hooks/useSyncEngine';
 import { queueWrite } from '@/library/electric_sql/WriteQueue';
 import RightIcon from '@mui/icons-material/ArrowRightAlt';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import ListIcon from '@mui/icons-material/ListAltOutlined';
 import { useNavigate } from 'react-router-dom';
+
+const LISTS_TABLE = 'lists';
+const TODOS_TABLE = 'todos';
 
 export type ListItemWidgetProps = {
   id: string;
@@ -30,18 +32,11 @@ export type ListItemWidgetProps = {
 export const ListItemWidget: React.FC<ListItemWidgetProps> = React.memo((props) => {
   const { id, title, description, selected } = props;
 
-  const isPowerSync = useIsPowerSync();
-  const powerSync = usePowerSyncOptional();
   const pglite = usePGliteOptional();
   const navigate = useNavigate();
 
   const deleteList = React.useCallback(async () => {
-    if (isPowerSync && powerSync) {
-      await powerSync.writeTransaction(async (tx: any) => {
-        await tx.execute(/* sql */ `DELETE FROM ${TODOS_TABLE} WHERE list_id = ?`, [id]);
-        await tx.execute(/* sql */ `DELETE FROM ${LISTS_TABLE} WHERE id = ?`, [id]);
-      });
-    } else if (pglite) {
+    if (pglite) {
       // PGlite: delete locally + queue for sync (todos first, then list)
       // Get todo IDs first for queue
       const todosResult = await pglite.query<{ id: string }>(`SELECT id FROM ${TODOS_TABLE} WHERE list_id = $1`, [id]);
@@ -52,11 +47,11 @@ export const ListItemWidget: React.FC<ListItemWidgetProps> = React.memo((props) 
       await pglite.query(`DELETE FROM ${LISTS_TABLE} WHERE id = $1`, [id]);
       await queueWrite(pglite, LISTS_TABLE, 'delete', {}, id);
     }
-  }, [id, isPowerSync, powerSync, pglite]);
+  }, [id, pglite]);
 
   const openList = React.useCallback(() => {
     navigate(TODO_LISTS_ROUTE + '/' + id);
-  }, [id]);
+  }, [id, navigate]);
 
   return (
     <S.MainPaper elevation={1}>
