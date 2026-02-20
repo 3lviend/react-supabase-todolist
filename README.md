@@ -2,14 +2,13 @@
 
 ## Overview
 
-Demo app demonstrating use of the [PowerSync SDK for Web](https://www.npmjs.com/package/@powersync/web) together with Supabase.
+Demo app demonstrating use of the [ElectricSQL SDK for Web](https://www.npmjs.com/package/@electric-sql/pglite-react) together with Supabase.
 
 ## Run Demo
 
 Prerequisites:
-* To run this demo, you need to have properly configured Supabase and PowerSync projects. Follow the instructions in our Supabase<>PowerSync integration guide:
-  * [Configure Supabase](https://docs.powersync.com/integration-guides/supabase-+-powersync#configure-supabase)
-  * [Configure PowerSync](https://docs.powersync.com/integration-guides/supabase-+-powersync#configure-powersync)
+* To run this demo, you need to have properly configured Supabase and ElectricSQL projects. Follow the instructions in our Supabase<>ElectricSQL integration guide:
+  * [Configure Supabase](https://supabase.com/partners/integrations/electricsql)
   * [Configure ElectricSQL](https://electric-sql.com/docs/integrations/supabase)
 
 Switch into the demo's directory:
@@ -42,8 +41,5 @@ Open [http://localhost:5173](http://localhost:5173) with your browser to see the
 
 ## Learn More
 
-Check out [the PowerSync Web SDK on GitHub](https://github.com/powersync-ja/powersync-js/tree/main/packages/web) - your feedback and contributions are welcome!
-
-To learn more about PowerSync, see the [PowerSync docs](https://docs.powersync.com).
 To learn more about ElectricSQL, see the [ElectricSQL docs](https://electric-sql.com/docs).
 To learn more about Supabase, see the [Supabase docs](https://supabase.com/docs).

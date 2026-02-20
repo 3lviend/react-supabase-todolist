@@ -136,32 +136,58 @@ export const SystemProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   React.useEffect(() => {
+    let isMounted = true;
+
     const init = async () => {
       try {
         await connector.init();
+        if (!isMounted) return;
+
         const pglite = await getElectricDatabase();
+        if (!isMounted) return;
+
         setDb(pglite);
         dbRef.current = pglite;
 
-        // Auto-connect on init
-        setConnecting(true);
-        syncHandleRef.current = await startElectricSync(pglite);
-        writeQueueCleanupRef.current = startWriteQueueLoop(pglite, connector);
-        setConnected(true);
-        setConnecting(false);
+        // Auto-connect on init (background)
+        setIsInitializing(false);
 
-        setIsInitializing(false);
+        setConnecting(true);
+        try {
+          const handle = await startElectricSync(pglite);
+          if (!isMounted) {
+            handle.unsubscribe();
+            return;
+          }
+          syncHandleRef.current = handle;
+
+          const cleanupQueue = startWriteQueueLoop(pglite, connector);
+          writeQueueCleanupRef.current = cleanupQueue;
+
+          setConnected(true);
+        } catch (syncErr) {
+          if (isMounted) {
+            console.warn('[Electric] Initial sync connection failed (offline?):', syncErr);
+          }
+        } finally {
+          if (isMounted) {
+            setConnecting(false);
+          }
+        }
       } catch (err: any) {
-        console.error('[Electric] Initialization error:', err);
-        setError(err?.message ?? 'Failed to initialize ElectricSQL');
-        setIsInitializing(false);
-        setConnecting(false);
+        if (isMounted) {
+          console.error('[Electric] Initialization error:', err);
+          setError(err?.message ?? 'Failed to initialize ElectricSQL');
+          setIsInitializing(false);
+          setConnecting(false);
+        }
       }
     };
 
     init();
 
     return () => {
+      isMounted = false;
       syncHandleRef.current?.unsubscribe();
       writeQueueCleanupRef.current?.();
     };

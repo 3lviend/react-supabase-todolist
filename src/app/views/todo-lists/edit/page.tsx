@@ -1,9 +1,7 @@
 import { NavigationPage } from '@/components/navigation/NavigationPage';
 import { useSupabase } from '@/components/providers/SyncProvider';
 import { TodoItemWidget } from '@/components/widgets/TodoItemWidget';
-import { LISTS_TABLE, TODOS_TABLE, TodoRecord } from '@/library/powersync/AppSchema';
-import { useIsPowerSync } from '@/hooks/useSyncEngine';
-import { usePowerSync as _usePowerSync, useQuery } from '@powersync/react';
+import { LISTS_TABLE, TODOS_TABLE, TodoRecord } from '@/library/electric_sql/AppSchema';
 import { useLiveQuery } from '@electric-sql/pglite-react';
 import { usePGlite } from '@electric-sql/pglite-react';
 import { queueWrite } from '@/library/electric_sql/WriteQueue';
@@ -29,70 +27,9 @@ import React, { Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 
 /**
- * PowerSync-specific section that uses useQuery for reactive SQL queries.
+ * TodoEditSection that uses PGlite live queries + local writes.
  */
-const PowerSyncTodoEditSection = () => {
-  const powerSync = _usePowerSync();
-  const supabase = useSupabase();
-  const { id: listID } = useParams();
-
-  const {
-    data: [listRecord]
-  } = useQuery(
-    /* sql */ `SELECT name FROM ${LISTS_TABLE} WHERE id = ?`,
-    [listID]
-  ) as { data: Array<{ name: string }> };
-
-  const { data: todos } = useQuery(
-    /* sql */ `SELECT * FROM ${TODOS_TABLE} WHERE list_id = ? ORDER BY created_at DESC, id`,
-    [listID]
-  ) as { data: TodoRecord[] };
-
-  const [showPrompt, setShowPrompt] = React.useState(false);
-  const nameInputRef = React.createRef<HTMLInputElement>();
-
-  const createNewTodo = async (description: string) => {
-    const userID = supabase?.currentSession?.user.id;
-    if (!userID) throw new Error(`Could not get user ID.`);
-
-    await powerSync.execute(
-      /* sql */ `INSERT INTO ${TODOS_TABLE} (id, created_at, created_by, description, list_id) VALUES (uuid(), datetime(), ?, ?, ?)`,
-      [userID, description, listID!]
-    );
-  };
-
-  const renameList = async (newName: string) => {
-    await powerSync.execute(
-      /* sql */ `UPDATE ${LISTS_TABLE} SET name = ? WHERE id = ?`,
-      [newName, listID!]
-    );
-  };
-
-  if (!listRecord) {
-    return (
-      <Box>
-        <Typography>No matching List found, please navigate back...</Typography>
-      </Box>
-    );
-  }
-
-  return (
-    <TodoEditUI
-      listName={listRecord.name}
-      todos={todos}
-      showPrompt={showPrompt}
-      setShowPrompt={setShowPrompt}
-      nameInputRef={nameInputRef}
-      onCreateTodo={createNewTodo}
-      onRename={renameList}
-    />
-  );
-};
-
-/**
- * ElectricSQL-specific section that uses PGlite live queries + local writes.
- */
-const ElectricTodoEditSection = () => {
+const TodoEditSection = () => {
   const supabase = useSupabase();
   const db = usePGlite();
   const { id: listID } = useParams();
@@ -176,7 +113,7 @@ const ElectricTodoEditSection = () => {
 };
 
 /**
- * Shared UI for todo edit (used by both engine sections).
+ * Shared UI for todo edit.
  */
 type TodoEditUIProps = {
   listName: string;
@@ -296,12 +233,10 @@ const TodoEditUI: React.FC<TodoEditUIProps> = ({
 };
 
 export default function TodoEditPage() {
-  const isPowerSync = useIsPowerSync();
-
   return (
     <Box>
       <Suspense fallback={<CircularProgress />}>
-        {isPowerSync ? <PowerSyncTodoEditSection /> : <ElectricTodoEditSection />}
+        <TodoEditSection />
       </Suspense>
     </Box>
   );

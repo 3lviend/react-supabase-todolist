@@ -1,4 +1,3 @@
-import { BaseObserver } from '@powersync/web';
 import { Session, SupabaseClient, createClient } from '@supabase/supabase-js';
 
 export type SupabaseConfig = {
@@ -13,17 +12,17 @@ export type SupabaseConnectorListener = {
 
 /**
  * Shared Supabase connector that handles auth-only responsibilities.
- * Engine-specific connectors (PowerSync, ElectricSQL) extend this class.
  */
-export class SupabaseConnector extends BaseObserver<SupabaseConnectorListener> {
+export class SupabaseConnector {
   readonly client: SupabaseClient;
   readonly config: SupabaseConfig;
+
+  protected listeners = new Set<Partial<SupabaseConnectorListener>>();
 
   ready: boolean;
   currentSession: Session | null;
 
   constructor() {
-    super();
     this.config = {
       supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
       supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -36,6 +35,15 @@ export class SupabaseConnector extends BaseObserver<SupabaseConnectorListener> {
     });
     this.currentSession = null;
     this.ready = false;
+  }
+
+  registerListener(listener: Partial<SupabaseConnectorListener>): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  protected iterateListeners(cb: (listener: Partial<SupabaseConnectorListener>) => void) {
+    this.listeners.forEach(cb);
   }
 
   async init() {

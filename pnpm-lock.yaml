@@ -26,9 +26,6 @@ importers:
       '@emotion/styled':
         specifier: 11.11.5
         version: 11.11.5(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
-      '@journeyapps/wa-sqlite':
-        specifier: ^1.4.1
-        version: 1.4.1
       '@mui/icons-material':
         specifier: ^5.15.12
         version: 5.18.0(@mui/material@5.18.0(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
@@ -38,12 +35,6 @@ importers:
       '@mui/x-data-grid':
         specifier: ^6.19.6
         version: 6.20.4(@mui/material@5.18.0(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@5.18.0(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@powersync/react':
-        specifier: ^1.8.2
-        version: 1.8.2(@powersync/common@1.46.0)(react@18.3.1)
-      '@powersync/web':
-        specifier: ^1.32.0
-        version: 1.32.0(@journeyapps/wa-sqlite@1.4.1)(@powersync/common@1.46.0)
       '@supabase/supabase-js':
         specifier: ^2.39.7
         version: 2.95.3
@@ -841,9 +832,6 @@ packages:
     resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
     engines: {node: '>=18'}
 
-  '@journeyapps/wa-sqlite@1.4.1':
-    resolution: {integrity: sha512-xAWys6opteBpWaKmHG1pZvBmQViEKFK/46YVEkYlWxa4F9VAG0gIjCpfIdcQvXdqZf7X3ByADGmNBcR/cJ1DqQ==}
-
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
 
@@ -977,22 +965,6 @@ packages:
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
-
-  '@powersync/common@1.46.0':
-    resolution: {integrity: sha512-NVIORj/IvLDBF6sWHsaO6U1u7v40yZaEGpscb+etIh7D7Oyaovv2novxdW94sSjbqmLAq4L8tFmgwNwgcU96Jg==}
-
-  '@powersync/react@1.8.2':
-    resolution: {integrity: sha512-15z8JKt66dq2bqX2P7QQ71eUIx3DWLc5WMdB/PDc9MIAHf1SERqKfzbzWGxKplQGHC/GogDA7G8IDoRadhNXOA==}
-    peerDependencies:
-      '@powersync/common': ^1.41.1
-      react: '*'
-
-  '@powersync/web@1.32.0':
-    resolution: {integrity: sha512-AYXF+0x5DTfyjPc2Eh89GZLTSanCZYqxsE/js1C9yRzI9+e3NkAjnX7r9n3FFkJS9PSlHlctDMxyb5x2epvMJg==}
-    hasBin: true
-    peerDependencies:
-      '@journeyapps/wa-sqlite': ^1.4.1
-      '@powersync/common': ^1.46.0
 
   '@remix-run/router@1.23.2':
     resolution: {integrity: sha512-Ic6m2U/rMjTkhERIa/0ZtXJP17QUi2CbWE7cqx4J58M8aA3QTfW+2UlQ4psvTX9IO1RfNVhK3pcpdjej7L+t2w==}
@@ -1459,9 +1431,6 @@ packages:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
     engines: {node: '>= 0.4'}
 
-  async-mutex@0.5.0:
-    resolution: {integrity: sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==}
-
   async@3.2.6:
     resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
 
@@ -1525,10 +1494,6 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
-  bson@6.10.4:
-    resolution: {integrity: sha512-WIsKqkSC0ABoBJuT1LEX+2HEvNmNKKgnTAyd0fL8qzK4SH2i9NXg+t08YtdZp/V9IZ33cxe3iV4yM0qg8lMQng==}
-    engines: {node: '>=16.20.1'}
-
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
@@ -1558,13 +1523,6 @@ packages:
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
-
-  comlink@4.4.2:
-    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
-
-  commander@12.1.0:
-    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
-    engines: {node: '>=18'}
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -1724,9 +1682,6 @@ packages:
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
-
-  event-iterator@2.0.0:
-    resolution: {integrity: sha512-KGft0ldl31BZVV//jj+IAIGCxkvvUkkON+ScH6zfoX+l+omX6001ggyRSpI0Io2Hlro0ThXotswCtfzS8UkIiQ==}
 
   events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
@@ -3622,8 +3577,6 @@ snapshots:
 
   '@isaacs/cliui@9.0.0': {}
 
-  '@journeyapps/wa-sqlite@1.4.1': {}
-
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -3761,25 +3714,6 @@ snapshots:
       fastq: 1.20.1
 
   '@popperjs/core@2.11.8': {}
-
-  '@powersync/common@1.46.0':
-    dependencies:
-      async-mutex: 0.5.0
-      event-iterator: 2.0.0
-
-  '@powersync/react@1.8.2(@powersync/common@1.46.0)(react@18.3.1)':
-    dependencies:
-      '@powersync/common': 1.46.0
-      react: 18.3.1
-
-  '@powersync/web@1.32.0(@journeyapps/wa-sqlite@1.4.1)(@powersync/common@1.46.0)':
-    dependencies:
-      '@journeyapps/wa-sqlite': 1.4.1
-      '@powersync/common': 1.46.0
-      async-mutex: 0.5.0
-      bson: 6.10.4
-      comlink: 4.4.2
-      commander: 12.1.0
 
   '@remix-run/router@1.23.2': {}
 
@@ -4213,10 +4147,6 @@ snapshots:
 
   async-function@1.0.0: {}
 
-  async-mutex@0.5.0:
-    dependencies:
-      tslib: 2.8.1
-
   async@3.2.6: {}
 
   at-least-node@1.0.0: {}
@@ -4291,8 +4221,6 @@ snapshots:
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
 
-  bson@6.10.4: {}
-
   buffer-from@1.1.2: {}
 
   call-bind-apply-helpers@1.0.2:
@@ -4319,10 +4247,6 @@ snapshots:
   chrome-trace-event@1.0.4: {}
 
   clsx@2.1.1: {}
-
-  comlink@4.4.2: {}
-
-  commander@12.1.0: {}
 
   commander@2.20.3: {}
 
@@ -4548,8 +4472,6 @@ snapshots:
   estree-walker@2.0.2: {}
 
   esutils@2.0.3: {}
-
-  event-iterator@2.0.0: {}
 
   events@3.3.0: {}
 

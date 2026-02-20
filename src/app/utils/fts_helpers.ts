@@ -1,28 +1,21 @@
-import { db } from '@/components/providers/powersync/SystemProvider';
-
 /**
- * adding * to the end of the search term will match any word that starts with the search term
- * e.g. searching bl will match blue, black, etc.
- * consult FTS5 Full-text Query Syntax documentation for more options
- * @param searchTerm
- * @returns a modified search term with options.
- */
-function createSearchTermWithOptions(searchTerm: string): string {
-  const searchTermWithOptions: string = `${searchTerm}*`;
-  return searchTermWithOptions;
-}
-
-/**
- * Search the FTS table for the given searchTerm
+ * Search the table for the given searchTerm using PGlite.
+ * @param db PGlite instance
  * @param searchTerm
  * @param tableName
- * @returns results from the FTS table
+ * @returns results from the table
  */
-export async function searchTable(searchTerm: string, tableName: string): Promise<any[]> {
-  const searchTermWithOptions = createSearchTermWithOptions(searchTerm);
-  return await db.getAll(`SELECT * FROM fts_${tableName} WHERE fts_${tableName} MATCH ? ORDER BY rank`, [
-    searchTermWithOptions
-  ]);
+export async function searchTable(db: any, searchTerm: string, tableName: string): Promise<any[]> {
+  if (!db) return [];
+  const likeTerm = `%${searchTerm}%`;
+  if (tableName === 'lists') {
+    const res = await db.query(`SELECT * FROM lists WHERE name ILIKE $1`, [likeTerm]);
+    return res.rows;
+  } else if (tableName === 'todos') {
+    const res = await db.query(`SELECT * FROM todos WHERE description ILIKE $1`, [likeTerm]);
+    return res.rows;
+  }
+  return [];
 }
 
 //Used to display the search results in the autocomplete text field

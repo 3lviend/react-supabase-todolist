@@ -1,10 +1,9 @@
 import { NavigationPage } from '@/components/navigation/NavigationPage';
 import { useSupabase } from '@/components/providers/SyncProvider';
-import { GuardBySync } from '@/components/widgets/GuardBySync';
 import { SearchBarWidget } from '@/components/widgets/SearchBarWidget';
 import { TodoListsWidget } from '@/components/widgets/TodoListsWidget';
-import { LISTS_TABLE } from '@/library/powersync/AppSchema';
-import { useIsPowerSync, usePowerSyncOptional, usePGliteOptional } from '@/hooks/useSyncEngine';
+import { LISTS_TABLE } from '@/library/electric_sql/AppSchema';
+import { usePGliteOptional } from '@/hooks/useSyncEngine';
 import { queueWrite } from '@/library/electric_sql/WriteQueue';
 import AddIcon from '@mui/icons-material/Add';
 import {
@@ -23,8 +22,6 @@ import React from 'react';
 
 export default function TodoListsPage() {
   const supabase = useSupabase();
-  const isPowerSync = useIsPowerSync();
-  const powerSync = usePowerSyncOptional();
   const pglite = usePGliteOptional();
 
   const [showPrompt, setShowPrompt] = React.useState(false);
@@ -37,21 +34,7 @@ export default function TodoListsPage() {
       throw new Error(`Could not create new lists, no userID found`);
     }
 
-    if (isPowerSync && powerSync) {
-      const res = await powerSync.execute(
-        /* sql */ `
-          INSERT INTO
-            ${LISTS_TABLE} (id, created_at, name, owner_id)
-          VALUES
-            (uuid (), datetime (), ?, ?) RETURNING *
-        `,
-        [name, userID]
-      );
-      const resultRecord = res.rows?.item(0);
-      if (!resultRecord) {
-        throw new Error('Could not create list');
-      }
-    } else if (pglite) {
+    if (pglite) {
       // ElectricSQL + PGlite: write locally (instant, offline-capable) + queue for sync
       const newId = crypto.randomUUID();
       const createdAt = new Date().toISOString();
@@ -72,10 +55,8 @@ export default function TodoListsPage() {
           <AddIcon />
         </S.FloatingActionButton>
         <Box>
-          {isPowerSync && <SearchBarWidget />}
-          <GuardBySync>
-            <TodoListsWidget />
-          </GuardBySync>
+          <SearchBarWidget />
+          <TodoListsWidget />
         </Box>
         <Dialog
           open={showPrompt}
