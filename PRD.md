@@ -40,7 +40,6 @@ This project was created to provide a tangible, production-grade example of a co
 *   **Must Have:** Local PGlite database, Bi-directional sync with Supabase, User Auth, Basic List/Task CRUD, Conflict-free merging.
 *   **Should Have:** Offline status indicators, Search functionality, Responsive Mobile UI (PWA).
 *   **Could Have:** Shared lists (multi-user collaboration), Push notifications, Attachment support.
-*   **Won't Have:** PowerSync integration (Removed in favor of exclusive ElectricSQL usage), Complex role-based access control (beyond owner-only).
 
 ### Future Enhancements
 *   **Collaborative Sharing:** Allow users to invite others to specific lists.
@@ -75,11 +74,10 @@ This project was created to provide a tangible, production-grade example of a co
 ### Development Phases & Critical Path
 *   **Phase 1: Foundation (Completed):** Setup Supabase project, initialize React app, configure basic ElectricSQL PGlite integration.
 *   **Phase 2: Feature Parity (Completed):** Implement Auth, CRUD for Lists/Todos, and basic styling.
-*   **Phase 3: Refactoring (Completed):** Remove legacy sync engines (PowerSync), consolidate on ElectricSQL, refine UI components (Layout, Menus).
+*   **Phase 3: Refactoring (Completed):** Consolidate on ElectricSQL, refine UI components (Layout, Menus).
 *   **Phase 4: Polish & Launch (Current):** Update documentation (README, PRD), final bug fixes (runtime loading), usage verification.
 
 ### Review Points & Launch Plan
-*   **Code Review:** Verify removal of all unused dependencies and dead code (PowerSync).
 *   **Type Safety:** Ensure strict sets of TypeScript rules are met (no implicit any).
 *   **Build Verification:** Successful `pnpm build` with new Vite type definitions.
 
