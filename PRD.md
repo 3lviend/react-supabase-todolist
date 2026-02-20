@@ -1,137 +1,108 @@
-# Product Requirement Document: Supabase CRDT Todo List
+# Product Requirement Document (PRD): Todolist React ElectricSQL
 
 ## Background
 
 ### Problem Statement
-In today's mobile-first world, users expect applications to work seamlessly regardless of network connectivity. Traditional web applications often fail or become unresponsive during intermittent internet access, leading to data loss, user frustration, and decreased productivity. Existing "offline" solutions often require complex manual synchronization logic, which is brittle and prone to conflict resolution issues.
+In the modern web landscape, users expect applications to be reliable and responsive regardless of network conditions. Traditional cloud-first web applications often become unusable during intermittent connectivity, leading to data loss, user frustration, and disrupted workflows. Users need a solution that guarantees data persistence and application availability 100% of the time, even when offline.
 
 ### Market Opportunity
-The rise of "Local-First" development paradigms reflects a growing trend towards software that prioritizes user agency, performance, and reliability. By leveraging technologies like CRDTs (Conflict-free Replicated Data Types) and robust synchronization engines (PowerSync, ElectricSQL), developers can provide a "desktop-class" experience in the browser. This project differentiates itself by demonstrating a pluggable sync-engine architecture on top of a proven Supabase backend.
+The "Local-First" software movement is gaining significant traction as devices become more powerful. By shifting the database to the client (using WASM-based SQLite/PostgreSQL), developers can offer "desktop-class" responsiveness in a web browser. This project leverages **ElectricSQL**, a cutting-edge sync engine, combined with **Supabase**, a proven backend-as-a-service, to deliver a best-in-class local-first experience. This combination addresses the complexity of conflict resolution and synchronization, which has historically been a barrier to entry for local-first development.
 
 ### User Personas
-1.  **The Mobile Professional:** Needs to manage tasks while commuting or in areas with poor signal (e.g., subways, elevators). They value speed and reliability above all.
-2.  **The Privacy-Conscious User:** Prefers data to be stored and processed locally as much as possible, syncing to the cloud only for backup and multi-device access.
-3.  **The Technical Interviewer/Developer:** Looking for a best-in-class example of how to implement local-first architecture using modern tools like React and Supabase.
+*   **Alex, the Field Professional:** Frequently works in areas with spotty internet (e.g., transit, basements). Needs to capture tasks immediately without waiting for a server round-trip.
+*   **Sarah, the Privacy Advocate:** Prefers data to reside on her device primarily, using the cloud only for backup and multi-device synchronization.
+*   **Devin, the Developer:** actively evaluating the ElectricSQL + Supabase stack. Needs a reference implementation to understand how to architect a production-ready local-first app.
 
 ### Vision Statement
-To provide a gold-standard reference implementation for local-first productivity applications, proving that complex data synchronization can be made simple, reliable, and invisible to the end-user.
+To establish the gold standard for local-first web application architecture, demonstrating that complex data synchronization can be robust, invisible, and developed with standard web technologies.
 
 ### Product Origin
-This project was born from the need to showcase the practical application of PowerSync and ElectricSQL within the Supabase ecosystem. It serves as both a functional tool and a technical demonstrator for developers seeking to build resilient, distributed web applications.
-
----
-
-## Objectives
-
-### SMART Goals
-*   **Specific:** Implement a fully functional todo list with local-first sync using PowerSync and ElectricSQL.
-*   **Measurable:** Achieve <100ms latency for all local operations (add/edit/delete) regardless of network status.
-*   **Achievable:** Utilize existing SDKs from JourneyApps (PowerSync) and ElectricSQL to handle sync complexity.
-*   **Relevant:** Align with the growing industry demand for resilient PWA (Progressive Web App) experiences.
-*   **Time-bound:** Reach "Product-Ready" MVP status within 4 weeks of initial development.
-
-### KPIs
-*   **Sync Reliability:** 99.9% successful conflict resolution without user intervention.
-*   **Offline Capability:** 100% feature parity between online and offline modes for core task management.
-*   **User Retention:** 40% WAU (Weekly Active Users) for demo testers.
-*   **Initial Load Time:** <2 seconds on standard 4G connections.
-
-### Qualitative Objectives
-*   **Invisible Sync:** Users should never have to manually click a "Save" or "Sync" button.
-*   **Optimistic UI:** Every action must feel instantaneous, with background sync handling the persistence.
-*   **Developer Ergonomics:** The codebase should be a model of clarity for those learning local-first patterns.
-
-### Strategic Alignment & Risk Mitigation
-*   **Alignment:** Positions the project as a leader in the Supabase ecosystem for advanced sync strategies.
-*   **Risk:** Dependency on third-party sync services. *Mitigation:* Abstracted "Sync Engine" layer allows for swapping providers.
-
----
+This project was created to provide a tangible, production-grade example of a collaborative Todo List application using **ElectricSQL** and **Supabase**. It serves as a proof-of-concept for replacing complex optimistic UI logic with a true local database approach.
 
 ## Features
 
 ### Core Features
-1.  **Local-First Authentication:** Utilizing Supabase Auth with persistent session handling for offline entry.
-2.  **Collaborative Lists:** Create and manage multiple todo lists that sync across devices.
-3.  **Real-time Task Management:** Add, toggle, and delete tasks within lists with instant local feedback.
-4.  **Pluggable Sync Engines:** Switch between PowerSync and ElectricSQL via configuration for comparison.
-5.  **PWA Support:** Installable on home screen with service worker for full offline access.
+1.  **Offline-First CRUD:** Create, Read, Update, and Delete Todo lists and items without any network connection.
+2.  **Real-Time Synchronization:** Automatic background synchronization of data between devices via ElectricSQL when online.
+3.  **Supabase Authentication:** Secure user identification and session management integrated with the local database.
+4.  **Multi-List Management:** Organize tasks into distinct lists with summary views (active/completed counts).
+5.  **Search:** Full-text search capability across lists and items using local SQL queries.
 
 ### User Benefits & Technical Specifications
-*   **Benefit:** Work anywhere, anytime. *Spec:* IndexedDB-backed local storage using SQLite (WASM).
-*   **Benefit:** Zero data loss. *Spec:* CRDT-based merging and causal ordering of updates.
-*   **Benefit:** Blazing fast interactions. *Spec:* React hooks bound to local reactive queries.
+*   **Benefit: Zero Latency interactions.**
+    *   *Technical Spec:* All read/write operations execute against a local PGlite (PostgreSQL in WASM) instance. UI updates are immediate.
+*   **Benefit: Data Consistency & Integrity.**
+    *   *Technical Spec:* ElectricSQL handles conflict resolution via CRDT-like patterns and replication protocols, ensuring eventual consistency across devices.
+*   **Benefit: Cross-Device Continuity.**
+    *   *Technical Spec:* Post-authentication, data syncs automatically. A user starting a list on mobile can finish it on desktop.
 
 ### Feature Prioritization (MoSCoW)
-*   **Must Have:** Secure Auth, Offline CRUD for tasks, PowerSync integration, PWA manifest.
-*   **Should Have:** ElectricSQL integration, Multi-list support, Sync status indicators.
-*   **Could Have:** Sub-tasks, Reminders/Notifications, Dark mode.
-*   **Won't Have (v1):** Real-time multi-user collaboration on a *single* list, Rich text descriptions.
+*   **Must Have:** Local PGlite database, Bi-directional sync with Supabase, User Auth, Basic List/Task CRUD, Conflict-free merging.
+*   **Should Have:** Offline status indicators, Search functionality, Responsive Mobile UI (PWA).
+*   **Could Have:** Shared lists (multi-user collaboration), Push notifications, Attachment support.
+*   **Won't Have:** PowerSync integration (Removed in favor of exclusive ElectricSQL usage), Complex role-based access control (beyond owner-only).
 
 ### Future Enhancements
-*   Attachment support (images/files) with background upload.
-*   Natural language processing for quick task entry.
-*   Integration with external calendars (iCal/Google).
-
----
+*   **Collaborative Sharing:** Allow users to invite others to specific lists.
+*   **Rich Text Support:** Markdown descriptions for tasks.
+*   **Native Mobile Wrappers:** Capacitor/React Native versions using the same core logic.
 
 ## User Experience
 
 ### UI Design Principles
-*   **Clarity:** Minimalist interface focusing on the task at hand.
-*   **Feedback:** Subtle visual cues (spinners/icons) when background sync is active.
-*   **Responsiveness:** Fluid layouts that work on mobile, tablet, and desktop.
+*   **Optimistic by Default:** The interface never waits for the server. Loading spinners are reserved only for initial boot or auth actions.
+*   **Connectivity Awareness:** Subtle indicators show sync status (Connected/Offline) without obstructing the user flow.
+*   **Simplicity:** A clean, distraction-free interface focusing on the content (Lists and Tasks).
 
 ### User Journey Mapping
-1.  **Entry:** User lands on page, prompted to login or try demo.
-2.  **Initialization:** App downloads initial schema and syncs latest data from Supabase.
-3.  **Interaction:** User adds "Buy Milk" list item. Item appears instantly.
-4.  **Disconnection:** User enters "Airplane Mode". Continues to add tasks.
-5.  **Reconnection:** User exits "Airplane Mode". App automatically pushes local changes to Supabase.
+1.  **Onboarding:** User lands on the welcome page -> Sign Up/Login via Supabase.
+2.  **Initialization:** App boots PGlite -> Establishes replication connection -> Downloads user's dataset.
+3.  **Core Loop:** User creates a list -> Adds tasks -> Checks them off. All actions reflect instantly.
+4.  **Offline Scenario:** User loses internet -> Continues editing -> App queues changes locally.
+5.  **Reconnection:** Internet returns -> App automatically syncs queued changes to Supabase -> UI updates with any remote changes.
 
-### Usability Testing & Accessibility
-*   **WCAG 2.1 Compliance:** High contrast ratios, aria-labels for all interactive elements.
-*   **Keyboard Navigation:** Full support for `Tab` and `Enter` for power users.
-*   **Mobile Touch Targets:** Minimum 44x44px for all buttons.
+### Usability Testing & Accessibility (WCAG)
+*   **Contrast & Sizing:** Adherence to WCAG AA standards for color contrast and touch target sizing (min 44px).
+*   **Keyboard Navigation:** Full Tabbing support for form inputs and list items.
+*   **Screen Readers:** Semantic HTML structure (main, section, list, button) and ARIA labels where necessary.
 
 ### Feedback Loops
-*   Embedded "Report Issue" button.
-*   Sync error dashboard (for developers/admin).
-
----
+*   **Sync Status:** Visual icon (Wifi/WifiOff) in the navigation bar to indicate connection state to the user.
+*   **Error Handling:** Graceful degradation with user-friendly toast notifications for auth or critical sync errors.
 
 ## Milestones
 
 ### Development Phases & Critical Path
-1.  **Phase 1: Foundation (Week 1):** Supabase setup, Auth implementation, Local SQLite integration.
-2.  **Phase 2: Core Logic (Week 2):** Task CRUD, Sync Engine abstraction, PowerSync integration.
-3.  **Phase 3: Optimization (Week 3):** PWA support, UI polishing, ElectricSQL implementation.
-4.  **Phase 4: Validation (Week 4):** Stress testing offline scenarios, Bug fixing, Documentation.
+*   **Phase 1: Foundation (Completed):** Setup Supabase project, initialize React app, configure basic ElectricSQL PGlite integration.
+*   **Phase 2: Feature Parity (Completed):** Implement Auth, CRUD for Lists/Todos, and basic styling.
+*   **Phase 3: Refactoring (Completed):** Remove legacy sync engines (PowerSync), consolidate on ElectricSQL, refine UI components (Layout, Menus).
+*   **Phase 4: Polish & Launch (Current):** Update documentation (README, PRD), final bug fixes (runtime loading), usage verification.
 
 ### Review Points & Launch Plan
-*   **Alpha Review:** Internal testing of core sync logic.
-*   **Beta Launch:** Release to project interviewers and selected community testers.
-*   **V1.0 Launch:** Public repository release with comprehensive README.
+*   **Code Review:** Verify removal of all unused dependencies and dead code (PowerSync).
+*   **Type Safety:** Ensure strict sets of TypeScript rules are met (no implicit any).
+*   **Build Verification:** Successful `pnpm build` with new Vite type definitions.
 
 ### Post-Launch Evaluation
-*   Analyze sync failure logs.
-*   Gather user feedback on UI responsiveness.
-
----
+*   **Performance Monitoring:** Track time-to-interactive and sync latency.
+*   **User Feedback:** Collect reports on sync reliability in varying network conditions.
 
 ## Technical Requirements
 
 ### Tech Stack & System Architecture
-*   **Frontend:** ReactJS (TS), Vite, TailwindCSS.
-*   **Local Database:** SQLite (WASM) via PowerSync/ElectricSQL drivers.
-*   **Backend:** Supabase (PostgreSQL, Auth, Realtime).
-*   **Sync:** PowerSync (Persistent WebSocket) or ElectricSQL (Replication Protocol).
+*   **Frontend Framework:** React 18, Vite 5.
+*   **Language:** TypeScript 5+.
+*   **Local Database:** `@electric-sql/pglite` (PostgreSQL in WASM).
+*   **State Management:** React Context + `useLiveQuery` (Reactive SQL).
+*   **Backend/Auth:** Supabase (PostgreSQL).
+*   **UI Library:** Material UI (MUI).
 
 ### Security Measures
-*   **Row-Level Security (RLS):** Strict Supabase policies to ensure users only see their own data.
-*   **JWT Validation:** All sync requests must carry a valid Supabase user token.
-*   **Data Encryption:** Sensitive environment variables managed via encrypted secrets.
+*   **Authentication:** Supabase GoTrue (JWT-based).
+*   **Authorization:** Supabase Row Level Security (RLS) policies enforcing `users` can only access their own `lists` and `todos`.
+*   **Environment Security:** Public/Private key separation; API keys stored in `.env.local` (not committed).
 
 ### Performance Metrics & Integration Requirements
-*   **API Interactions:** Minimized through sync engine; direct Supabase calls used only for Auth.
-*   **Memory Usage:** <100MB for standard task datasets.
-*   **Storage Limit:** Managed via browser IndexedDB quotas.
+*   **Initial Load:** Application shell should load in < 1.5s.
+*   **Sync Latency:** Local-to-Remote sync within 1s on stable 4G.
+*   **Bundle Size:** Optimized vendor chunks; prevent unnecessary inclusion of unused icons/libraries.
