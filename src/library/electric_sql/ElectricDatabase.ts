@@ -88,22 +88,46 @@ async function initDatabase(): Promise<PGlite> {
  * Returns an unsubscribe function to stop syncing.
  */
 export async function startElectricSync(db: PGlite): Promise<{ unsubscribe: () => void }> {
-  const electricUrl = getElectricUrl();
+  let electricUrl = getElectricUrl();
+  const envParams: Record<string, string> = {};
+
+  // Robust parsing: extract query params and normalize the base URL
+  try {
+    const urlObj = new URL(electricUrl);
+    const baseUrl = `${urlObj.protocol}//${urlObj.host}`;
+
+    // Extract existing params (e.g., source_id, source_secret)
+    urlObj.searchParams.forEach((value, key) => {
+      // Skip 'offset' if it's -1 or similar, as we want the SDK to manage it, 
+      // but 'source_id' is mandatory for Electric Cloud.
+      if (key !== 'offset' && key !== 'table') {
+        envParams[key] = value;
+      }
+    });
+
+    if (urlObj.pathname.includes('/v1/shape')) {
+      electricUrl = baseUrl + '/v1/shape';
+    } else {
+      electricUrl = baseUrl;
+    }
+  } catch (e) {
+    console.warn('[Electric] Invalid VITE_ELECTRIC_SQL_SERVICE_URL, using as is:', electricUrl);
+  }
 
   const sync = await (db as any).electric.syncShapesToTables({
     shapes: {
       lists: {
         shape: {
-          url: `${electricUrl}/v1/shape`,
-          params: { table: LISTS_TABLE }
+          url: electricUrl.endsWith('/v1/shape') ? electricUrl : `${electricUrl}/v1/shape`,
+          params: { ...envParams, table: LISTS_TABLE }
         },
         table: LISTS_TABLE,
         primaryKey: ['id']
       },
       todos: {
         shape: {
-          url: `${electricUrl}/v1/shape`,
-          params: { table: TODOS_TABLE }
+          url: electricUrl.endsWith('/v1/shape') ? electricUrl : `${electricUrl}/v1/shape`,
+          params: { ...envParams, table: TODOS_TABLE }
         },
         table: TODOS_TABLE,
         primaryKey: ['id']

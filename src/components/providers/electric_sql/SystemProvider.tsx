@@ -78,11 +78,13 @@ const ElectricDataProvider = ({ children, connector }: { children: React.ReactNo
     `SELECT * FROM ${TODOS_TABLE} ORDER BY created_at DESC, id`
   );
 
-  const syncData = React.useMemo<ElectricSyncData>(() => ({
-    lists: listsResult?.rows ?? [],
-    todos: todosResult?.rows ?? [],
-    isLoading: !listsResult || !todosResult
-  }), [listsResult, todosResult]);
+  const syncData = React.useMemo<ElectricSyncData>(() => {
+    return {
+      lists: listsResult?.rows ?? [],
+      todos: todosResult?.rows ?? [],
+      isLoading: !listsResult || !todosResult
+    };
+  }, [listsResult, todosResult]);
 
   return (
     <ElectricSyncContext.Provider value={syncData}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CircularProgress, Grid, styled } from '@mui/material';
 import { useSupabase } from '@/components/providers/SyncProvider';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { DEFAULT_ENTRY_ROUTE, LOGIN_ROUTE } from '@/app/router';
 
 export type LoginFormParams = {
@@ -10,52 +10,26 @@ export type LoginFormParams = {
 };
 
 /**
- * This page shows a loading spinner we detect a session
- * and redirect either to the app or auth flow.
+ * This page redirects either to the app or auth flow based on session.
  */
 export default function EntryPage() {
   const connector = useSupabase();
-  const navigate = useNavigate();
 
-  const navigateToMainView = () => {
-    if (connector?.currentSession) {
-      navigate(DEFAULT_ENTRY_ROUTE);
-    }
-  };
+  if (!connector || !connector.ready) {
+    return (
+      <S.MainGrid container>
+        <S.CenteredGrid item xs={12} md={6} lg={5}>
+          <CircularProgress />
+        </S.CenteredGrid>
+      </S.MainGrid>
+    );
+  }
 
-  React.useEffect(() => {
-    if (!connector) {
-      console.error(`No Supabase connector has been created yet.`);
-      return;
-    }
-
-    if (!connector.ready) {
-      const l = connector.registerListener({
-        initialized: () => {
-          /**
-           * Redirect if on the entry view
-           */
-          if (connector.currentSession) {
-            navigate(DEFAULT_ENTRY_ROUTE);
-          } else {
-            navigate(LOGIN_ROUTE);
-          }
-        }
-      });
-      return () => l?.();
-    }
-
-    // There should be a session at this point. The auth guard will navigate to the login if not
-    navigateToMainView();
-  }, []);
-
-  return (
-    <S.MainGrid container>
-      <S.CenteredGrid item xs={12} md={6} lg={5}>
-        <CircularProgress />
-      </S.CenteredGrid>
-    </S.MainGrid>
-  );
+  if (connector.currentSession) {
+    return <Navigate to={DEFAULT_ENTRY_ROUTE} replace />;
+  } else {
+    return <Navigate to={LOGIN_ROUTE} replace />;
+  }
 }
 
 namespace S {
